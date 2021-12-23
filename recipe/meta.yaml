@@ -13,7 +13,7 @@ source:
     - hardcode_build.diff
 
 build:
-  number: 0
+  number: 1
   skip: true  # [not linux]
   script:
     - ./configure --prefix=$PREFIX
@@ -40,6 +40,7 @@ requirements:
   # however, it is best to bundle them here
   # otherwise the pkg is meaningless... 
   run:
+    - tar
     - python
     - requests >=2.6.0
     - squashfs-tools >=4.2
