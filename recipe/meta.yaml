@@ -13,7 +13,7 @@ source:
     - hardcode_build.diff
 
 build:
-  number: 0
+  number: 1
   skip: true  # [not linux]
   script:
     - ./configure --prefix=$PREFIX
