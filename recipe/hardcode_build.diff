@@ -1,26 +1,37 @@
+From 50f83a6922e7db7a5371152257204db04e02d4e9 Mon Sep 17 00:00:00 2001
+From: ngam <67342040+ngam@users.noreply.github.com>
+Date: Thu, 20 Jan 2022 16:48:44 -0500
+Subject: [PATCH] hardcode options
+
+---
+ configure | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
 diff --git a/configure b/configure
-index 686218a..83b2a53 100755
+index dabfbc0..026fb91 100755
 --- a/configure
 +++ b/configure
-@@ -7423,8 +7423,8 @@ else
- fi
- 
-  if test $enable_test = yes; then
--  ENABLE_TEST_TRUE=
--  ENABLE_TEST_FALSE='#'
-+  ENABLE_TEST_TRUE='#'
-+  ENABLE_TEST_FALSE=
+@@ -7385,8 +7385,8 @@ fi
+ # Below are all the variables we want available outside configure.
+
+  if test $enable_ch_image = yes; then
+-  ENABLE_CH_IMAGE_TRUE=
+-  ENABLE_CH_IMAGE_FALSE='#'
++  ENABLE_CH_IMAGE_TRUE='#'
++  ENABLE_CH_IMAGE_FALSE=
  else
-   ENABLE_TEST_TRUE='#'
-   ENABLE_TEST_FALSE=
-@@ -7388,8 +7388,8 @@ fi
-   ENABLE_CH_IMAGE_TRUE=
-   ENABLE_CH_IMAGE_FALSE='#'
+   ENABLE_CH_IMAGE_TRUE='#'
+   ENABLE_CH_IMAGE_FALSE=
+@@ -7425,8 +7425,8 @@ fi
+   ENABLE_TEST_TRUE=
+   ENABLE_TEST_FALSE='#'
  else
--  ENABLE_CH_IMAGE_TRUE='#'
--  ENABLE_CH_IMAGE_FALSE=
-+  ENABLE_CH_IMAGE_TRUE=
-+  ENABLE_CH_IMAGE_FALSE='#'
+-  ENABLE_TEST_TRUE='#'
+-  ENABLE_TEST_FALSE=
++  ENABLE_TEST_TRUE=
++  ENABLE_TEST_FALSE='#'
  fi
- 
-  if test $enable_bundled_lark = yes; then
+
+
+-- 
+2.34.1
