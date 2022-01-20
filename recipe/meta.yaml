@@ -10,7 +10,7 @@ source:
   patches:
     # this hard-turns the flag OFF for building the tests (otherwise fail)
     # it also hard-turns the flag ON for ch-image.
-    # - hardcode_build.diff
+    - hardcode_build.diff
 
 build:
   number: 0
