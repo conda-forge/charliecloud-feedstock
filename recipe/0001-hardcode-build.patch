@@ -1,0 +1,38 @@
+From 9d67662ec44e30d32d8466ca3488086f0152f1a3 Mon Sep 17 00:00:00 2001
+From: ngam <67342040+ngam@users.noreply.github.com>
+Date: Thu, 20 Jan 2022 17:42:50 -0500
+Subject: [PATCH] hardcode build
+
+---
+ configure | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/configure b/configure
+index dabfbc0..9bf7435 100755
+--- a/configure
++++ b/configure
+@@ -7388,8 +7388,8 @@ fi
+   ENABLE_CH_IMAGE_TRUE=
+   ENABLE_CH_IMAGE_FALSE='#'
+ else
+-  ENABLE_CH_IMAGE_TRUE='#'
+-  ENABLE_CH_IMAGE_FALSE=
++  ENABLE_CH_IMAGE_TRUE=
++  ENABLE_CH_IMAGE_FALSE='#'
+ fi
+ 
+  if test $enable_html = yes; then
+@@ -7422,8 +7422,8 @@ $as_echo "#define ENABLE_SYSLOG 1" >>confdefs.h
+ 
+ fi
+  if test $enable_test = yes; then
+-  ENABLE_TEST_TRUE=
+-  ENABLE_TEST_FALSE='#'
++  ENABLE_TEST_TRUE='#'
++  ENABLE_TEST_FALSE=
+ else
+   ENABLE_TEST_TRUE='#'
+   ENABLE_TEST_FALSE=
+-- 
+2.34.1
+

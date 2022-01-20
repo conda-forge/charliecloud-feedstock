@@ -1,4 +1,4 @@
-{% set version = "0.25" %}
+{% set version = "0.26" %}
 
 package:
   name: charliecloud
@@ -6,14 +6,14 @@ package:
 
 source:
   url: https://github.com/hpc/charliecloud/releases/download/v{{ version }}/charliecloud-{{ version }}.tar.gz
-  sha256: 62d6fd211e3a573f54578e1b01d5c298f9788b7eaf2db46ac94c2dcef604cc94
+  sha256: 5e1e64e869c59905fac0cbbd6ceb82340ee54728415d28ef588fd5de5557038a
   patches:
     # this hard-turns the flag OFF for building the tests (otherwise fail)
     # it also hard-turns the flag ON for ch-image.
-    - hardcode_build.diff
+    - 0001-hardcode-build.patch
 
 build:
-  number: 1
+  number: 0
   skip: true  # [not linux]
   script:
     - ./configure --prefix=$PREFIX
@@ -23,18 +23,18 @@ build:
 
   missing_dso_whitelist:
     - $RPATH/libsotest.so.1
-    
+
 requirements:
   build:
     - {{ compiler('c') }}
     - sysroot_linux-64 2.17  # [linux64]
     - make
-    
+
   host:
   # not clear if python (>=3.6) + requests (>=2.6.0) are needed at all?
     - python
     - requests >=2.6.0
-  
+
   # strictly speaking:
   # squashfs + squashfuse are not needed
   # however, it is best to bundle them here
