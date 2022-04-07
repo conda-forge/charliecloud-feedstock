@@ -49,11 +49,9 @@ requirements:
 test:
   commands:
     - echo "testing..."
-    - ch-build --help
     - ch-run --help
     - ch-run --version
-    - ch-builder2tar --help
-    - ch-tar2dir --help
+    - ch-image --help
 #     # try the tutorial: 
 #     # https://hpc.github.io/charliecloud/tutorial.html#seconds-to-charliecloud
 #     - cd $PREFIX/share/doc/charliecloud/examples/hello
