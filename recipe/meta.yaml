@@ -13,7 +13,7 @@ source:
     - 0001-hardcode-build.patch
 
 build:
-  number: 0
+  number: 1
   skip: true  # [not linux]
   script:
     - ./configure --prefix=$PREFIX
