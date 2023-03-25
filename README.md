@@ -1,11 +1,11 @@
-About charliecloud
-==================
+About charliecloud-feedstock
+============================
+
+Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/charliecloud-feedstock/blob/main/LICENSE.txt)
 
 Home: https://hpc.github.io/charliecloud
 
 Package license: Apache-2.0
-
-Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/charliecloud-feedstock/blob/main/LICENSE.txt)
 
 Summary: Lightweight user-defined software stacks for high-performance computing.
 
