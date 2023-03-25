@@ -1,4 +1,4 @@
-{% set version = "0.31" %}
+{% set version = "0.32" %}
 
 package:
   name: charliecloud
@@ -6,7 +6,7 @@ package:
 
 source:
   url: https://github.com/hpc/charliecloud/releases/download/v{{ version }}/charliecloud-{{ version }}.tar.gz
-  sha256: 7305c3d9010386c1b96fb95297feccb5c9d7ff82a3377d1d98eb8faef76bced9
+  sha256: 47826b14966c400b250c35ff28a903f8e5b5e12d9e2a2b473e0f00f4e8393c47
   patches:
     # this hard-turns the flag OFF for building the tests (otherwise fail)
     # it also hard-turns the flag ON for ch-image.
