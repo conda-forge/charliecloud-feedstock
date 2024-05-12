@@ -1,4 +1,4 @@
-{% set version = "0.34" %}
+{% set version = "0.37" %}
 
 package:
   name: charliecloud
@@ -6,14 +6,14 @@ package:
 
 source:
   url: https://github.com/hpc/charliecloud/releases/download/v{{ version }}/charliecloud-{{ version }}.tar.gz
-  sha256: 034080c162949f4344ae1011cda026d4bb3ecd5cdb53135ac06d236f87e3b27d
+  sha256: 1fd8e7cd1dd09a001aead5e105e3234792c1a1e9e30417f495ab3f422ade7397
   patches:
     # this hard-turns the flag OFF for building the tests (otherwise fail)
     # it also hard-turns the flag ON for ch-image.
     - 0001-hardcode-build.patch
 
 build:
-  number: 1
+  number: 0
   skip: true  # [not linux]
   script:
     - ./configure --prefix=$PREFIX
@@ -27,7 +27,7 @@ build:
 requirements:
   build:
     - {{ compiler('c') }}
-    - sysroot_linux-64 2.17  # [linux64]
+    - {{ stdlib("c") }}
     - make
 
   host:
