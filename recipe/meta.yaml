@@ -88,7 +88,7 @@ about:
     format converter), targeting environments where rootless Docker/Podman
     aren't viable but unprivileged user namespaces are available.
   dev_url: https://gitlab.com/charliecloud/charliecloud
-  doc_url: https://charliecloud.io/
+  doc_url: https://charliecloud.io/latest/index.html
 
 extra:
   recipe-maintainers:
