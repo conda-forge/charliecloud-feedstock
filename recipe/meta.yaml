@@ -79,6 +79,14 @@ about:
   license: Apache-2.0
   license_file: LICENSE
   summary: Lightweight user-defined software stacks for high-performance computing.
+  description: |
+    Charliecloud uses Linux user and mount namespaces to run unprivileged
+    containers from standard image formats (Docker/OCI) without a daemon or
+    setuid root binary, letting HPC users run containerized workloads on
+    cluster compute nodes. It includes ch-run (a small C binary launcher),
+    ch-image (a Python image manager and builder), and ch-convert (an image
+    format converter), targeting environments where rootless Docker/Podman
+    aren't viable but unprivileged user namespaces are available.
   dev_url: https://gitlab.com/charliecloud/charliecloud
   doc_url: https://charliecloud.io/
 
