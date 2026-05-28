@@ -16,7 +16,10 @@ build:
   number: 0
   skip: true  # [not linux]
   script:
-    - ./configure --prefix=$PREFIX
+    # --enable-buggy-build drops -Werror; needed because v0.44's str.h
+    # redefines strncmp (as a poison macro for safety) which collides
+    # with glibc's _FORTIFY_SOURCE-provided macro in conda-forge's sysroot.
+    - ./configure --prefix=$PREFIX --enable-buggy-build
     - make
     - make install
     # Broken symlink (libexec/charliecloud/fixtures/symlink-to-tmp) that conda's
