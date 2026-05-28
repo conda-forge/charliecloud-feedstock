@@ -2,7 +2,7 @@
 
 package:
   name: charliecloud
-  version: {{ version }}
+  version: "{{ version }}"
 
 source:
   # Upstream relocated from github.com/hpc/charliecloud to GitLab in Oct 2024;
@@ -48,12 +48,13 @@ requirements:
     - pkg-config
 
   host:
-    # configure.ac: vmin_python=3.6, vmin_requests=2.6.0
-    - python >=3.6
+    # python is pinned by conda-forge's build matrix; vmin_python=3.6
+    # in configure.ac but the matrix only builds against 3.10+ anyway.
+    - python
     - requests >=2.6.0
 
   run:
-    - python >=3.6
+    - python
     - requests >=2.6.0
     - tar
     # SquashFS image support (vmin_mksquashfs=4.2, vmin_squashfuse=0.1.100).
