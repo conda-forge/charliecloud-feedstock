@@ -5,9 +5,10 @@ package:
   version: {{ version }}
 
 source:
-  # Upstream moved from GitHub to GitLab in Oct 2024; releases since v0.40 are
-  # cut only on GitLab. The asset URL is keyed by GitLab's internal package_id
-  # (not version-templatable) — update both url and sha256 on each bump.
+  # Upstream relocated from github.com/hpc/charliecloud to GitLab in Oct 2024;
+  # releases since v0.40 are cut only on GitLab. The asset URL is keyed by
+  # GitLab's internal package_id and is not version-templatable; update both
+  # url and sha256 on each bump (see https://charliecloud.io/ for releases).
   url: https://gitlab.com/charliecloud/charliecloud/-/package_files/290882913/download
   fn: charliecloud-{{ version }}.tar.gz
   sha256: 2a01ecbb6cb2cfe0495338484fdba1ea63e44a48caff0d77ddd602f9e12177cf
@@ -16,17 +17,20 @@ build:
   number: 0
   skip: true  # [not linux]
   script:
-    # --enable-buggy-build drops -Werror; needed because v0.44's str.h
-    # redefines strncmp (as a poison macro for safety) which collides
-    # with glibc's _FORTIFY_SOURCE-provided macro in conda-forge's sysroot.
+    # --enable-buggy-build drops -Werror so the build survives the harmless
+    # `strncmp` redefinition warning: charliecloud's str.h installs a poison
+    # macro that collides with glibc's _FORTIFY_SOURCE strncmp macro from the
+    # conda-forge sysroot.
     - ./configure --prefix=$PREFIX --enable-buggy-build
     - make
     - make install
-    # Broken symlink (libexec/charliecloud/fixtures/symlink-to-tmp) that conda's
-    # link step rejects with "Is a directory". Removing just the symlink keeps the
-    # rest of the test fixtures intact for ch-test.
+    # Test fixture libexec/charliecloud/fixtures/symlink-to-tmp is a broken
+    # symlink; conda's link step rejects it with `[Errno 21] Is a directory`.
+    # Drop the symlink only; keep the rest of the fixtures usable for ch-test.
     - rm -f $PREFIX/libexec/charliecloud/fixtures/symlink-to-tmp
 
+  # libsotest.so.1 is a test fixture shared library (test/sotest/), installed
+  # under libexec/charliecloud/sotest/ but not linked from anything we ship.
   missing_dso_whitelist:
     - $RPATH/libsotest.so.1
 
@@ -35,36 +39,38 @@ requirements:
     - {{ compiler('c') }}
     - {{ stdlib("c") }}
     - make
+    # Required since v0.36 at ./autogen.sh / configure time (see upstream #1845).
     - pkg-config
 
   host:
-    - python
+    # configure.ac: vmin_python=3.6, vmin_requests=2.6.0
+    - python >=3.6
     - requests >=2.6.0
 
-  # squashfs-tools / squashfuse are runtime extras for SquashFS image support;
-  # bundled here so the package is useful out of the box.
   run:
-    - tar
-    - python
+    - python >=3.6
     - requests >=2.6.0
+    - tar
+    # SquashFS image support (vmin_mksquashfs=4.2, vmin_squashfuse=0.1.100).
     - squashfs-tools >=4.2
     - squashfuse >=0.1.100
 
 test:
   commands:
+    # Smoke test the four user-facing entry points. (Subcommand exec paths
+    # like `ch-image gestalt` are intentionally not exercised here because
+    # several lack entry-point registrations and raise NotImplementedError.)
     - ch-run --help
     - ch-run --version
     - ch-image --help
     - ch-image --version
     - ch-convert --help
-    - ch-image gestalt
 
 about:
   home: https://charliecloud.io/
   license: Apache-2.0
   license_file: LICENSE
   summary: Lightweight user-defined software stacks for high-performance computing.
-  description: Lightweight user-defined software stacks for high-performance computing.
   dev_url: https://gitlab.com/charliecloud/charliecloud
   doc_url: https://charliecloud.io/
 
