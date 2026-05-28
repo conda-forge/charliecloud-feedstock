@@ -1,4 +1,4 @@
-{% set version = "0.34" %}
+{% set version = "0.38" %}
 
 package:
   name: charliecloud
@@ -6,19 +6,14 @@ package:
 
 source:
   url: https://github.com/hpc/charliecloud/releases/download/v{{ version }}/charliecloud-{{ version }}.tar.gz
-  sha256: 034080c162949f4344ae1011cda026d4bb3ecd5cdb53135ac06d236f87e3b27d
-  patches:
-    # this hard-turns the flag OFF for building the tests (otherwise fail)
-    # it also hard-turns the flag ON for ch-image.
-    - 0001-hardcode-build.patch
+  sha256: 1a3766d57ff4db9c65fd5c561bbaac52476c9a19fa10c1554190912a03429b7a
 
 build:
-  number: 3
+  number: 0
   skip: true  # [not linux]
   script:
-    - ./configure --prefix=$PREFIX
+    - ./configure --prefix=$PREFIX --disable-test
     - make
-    - make check
     - make install
 
   missing_dso_whitelist:
@@ -29,16 +24,14 @@ requirements:
     - {{ compiler('c') }}
     - {{ stdlib("c") }}
     - make
+    - pkg-config
 
   host:
-  # not clear if python (>=3.6) + requests (>=2.6.0) are needed at all?
     - python
     - requests >=2.6.0
 
-  # strictly speaking:
-  # squashfs + squashfuse are not needed
-  # however, it is best to bundle them here
-  # otherwise the pkg is meaningless... 
+  # squashfs-tools / squashfuse are runtime extras for SquashFS image support;
+  # bundled here so the package is useful out of the box.
   run:
     - tar
     - python
@@ -48,29 +41,19 @@ requirements:
 
 test:
   commands:
-    - echo "testing..."
     - ch-run --help
     - ch-run --version
     - ch-image --help
-#     # try the tutorial: 
-#     # https://hpc.github.io/charliecloud/tutorial.html#seconds-to-charliecloud
-#     - cd $PREFIX/share/doc/charliecloud/examples/hello
-#     - ch-build -t hello . --force
-#     - ch-builder2tar hello /var/tmp
-#     - ch-tar2dir /var/tmp/hello.tar.gz /var/tmp
-# #     # all tests pass up to ch-run because of problem with user+mnt usernames
-# #     # in conda-forge build centos build containers
-# #     - ch-run /var/tmp/hello -- echo "I'm in a container"
+    - ch-image --version
+    - ch-convert --help
+    - ch-image gestalt
 
 about:
   home: https://hpc.github.io/charliecloud
   license: Apache-2.0
   license_file: LICENSE
   summary: Lightweight user-defined software stacks for high-performance computing.
-
   description: Lightweight user-defined software stacks for high-performance computing.
-
-
   dev_url: https://github.com/hpc/charliecloud
   doc_url: https://hpc.github.io/charliecloud
 
