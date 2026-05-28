@@ -62,12 +62,13 @@ requirements:
 
 test:
   commands:
-    # Verify the version baked into the binaries matches the package version;
-    # catches silent build-of-wrong-source errors. Subcommands like
-    # `ch-image gestalt` are not exercised — several lack entry-point
-    # registrations in v0.44 and raise NotImplementedError.
+    # Smoke-test the user-facing entry points. ch-image is a Python script,
+    # so version-match guards against a silent build-of-wrong-source. ch-run
+    # writes --version to stderr (argp default), so don't pipe-grep it.
+    # Subcommands like `ch-image gestalt` are not exercised — several lack
+    # entry-point registrations in v0.44 and raise NotImplementedError.
     - ch-run --help
-    - ch-run --version | grep -Fx {{ version }}
+    - ch-run --version
     - ch-image --help
     - ch-image --version | grep -Fx {{ version }}
     - ch-convert --help
