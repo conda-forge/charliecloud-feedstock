@@ -1,5 +1,4 @@
 {% set version = "0.44" %}
-{% set python_min = "3.6" %}
 
 package:
   name: charliecloud
@@ -50,11 +49,11 @@ requirements:
 
   host:
     # configure.ac: vmin_python=3.6, vmin_requests=2.6.0
-    - python {{ python_min }}
+    - python >=3.6
     - requests >=2.6.0
 
   run:
-    - python >={{ python_min }}
+    - python >=3.6
     - requests >=2.6.0
     - tar
     # SquashFS image support (vmin_mksquashfs=4.2, vmin_squashfuse=0.1.100).
