@@ -15,6 +15,9 @@ build:
     - ./configure --prefix=$PREFIX
     - make
     - make install
+    # Test fixtures contain a broken symlink (libexec/charliecloud/fixtures/symlink-to-tmp)
+    # that conda's link step can't handle. Tests aren't run from this package anyway.
+    - rm -rf $PREFIX/libexec/charliecloud/fixtures
 
   missing_dso_whitelist:
     - $RPATH/libsotest.so.1
