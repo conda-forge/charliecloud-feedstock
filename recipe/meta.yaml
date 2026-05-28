@@ -1,12 +1,16 @@
-{% set version = "0.38" %}
+{% set version = "0.44" %}
 
 package:
   name: charliecloud
   version: {{ version }}
 
 source:
-  url: https://github.com/hpc/charliecloud/releases/download/v{{ version }}/charliecloud-{{ version }}.tar.gz
-  sha256: 1a3766d57ff4db9c65fd5c561bbaac52476c9a19fa10c1554190912a03429b7a
+  # Upstream moved from GitHub to GitLab in Oct 2024; releases since v0.40 are
+  # cut only on GitLab. The asset URL is keyed by GitLab's internal package_id
+  # (not version-templatable) — update both url and sha256 on each bump.
+  url: https://gitlab.com/charliecloud/charliecloud/-/package_files/290882913/download
+  fn: charliecloud-{{ version }}.tar.gz
+  sha256: 2a01ecbb6cb2cfe0495338484fdba1ea63e44a48caff0d77ddd602f9e12177cf
 
 build:
   number: 0
@@ -53,13 +57,13 @@ test:
     - ch-image gestalt
 
 about:
-  home: https://hpc.github.io/charliecloud
+  home: https://charliecloud.io/
   license: Apache-2.0
   license_file: LICENSE
   summary: Lightweight user-defined software stacks for high-performance computing.
   description: Lightweight user-defined software stacks for high-performance computing.
-  dev_url: https://github.com/hpc/charliecloud
-  doc_url: https://hpc.github.io/charliecloud
+  dev_url: https://gitlab.com/charliecloud/charliecloud
+  doc_url: https://charliecloud.io/
 
 extra:
   recipe-maintainers:
