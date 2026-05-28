@@ -1,4 +1,5 @@
 {% set version = "0.44" %}
+{% set python_min = "3.6" %}
 
 package:
   name: charliecloud
@@ -6,30 +7,30 @@ package:
 
 source:
   # Upstream relocated from github.com/hpc/charliecloud to GitLab in Oct 2024;
-  # releases since v0.40 are cut only on GitLab. The asset URL is keyed by
-  # GitLab's internal package_id and is not version-templatable; update both
-  # url and sha256 on each bump (see https://charliecloud.io/ for releases).
-  url: https://gitlab.com/charliecloud/charliecloud/-/package_files/290882913/download
-  fn: charliecloud-{{ version }}.tar.gz
-  sha256: 2a01ecbb6cb2cfe0495338484fdba1ea63e44a48caff0d77ddd602f9e12177cf
+  # releases since v0.40 are cut only on GitLab. Using the templatable git
+  # archive URL so future bumps need only `version` + `sha256` updates.
+  url: https://gitlab.com/charliecloud/charliecloud/-/archive/v{{ version }}/charliecloud-v{{ version }}.tar.gz
+  sha256: 1c2504f8a3f03f85d90e51de561da3b56a659af02f6b2fb732bfaf15d6de01a2
 
 build:
   number: 0
   skip: true  # [not linux]
   script:
-    # --enable-buggy-build drops -Werror so the build survives the harmless
-    # `strncmp` redefinition warning: charliecloud's str.h installs a poison
-    # macro that collides with glibc's _FORTIFY_SOURCE strncmp macro from the
-    # conda-forge sysroot.
-    - ./configure --prefix=$PREFIX --enable-buggy-build
-    - make
+    # Git archives ship configure.ac only; bootstrap the autotools build.
+    - ./autogen.sh
+    # --enable-buggy-build drops -Werror so the build survives v0.44's str.h
+    # `strncmp` poison-macro vs glibc _FORTIFY_SOURCE `strncmp` macro collision
+    # in conda-forge's sysroot. --disable-html/man skip the sphinx-build probe
+    # since this package doesn't ship docs.
+    - ./configure --prefix=$PREFIX --enable-buggy-build --disable-html --disable-man
+    - make -j${CPU_COUNT}
     - make install
-    # Test fixture libexec/charliecloud/fixtures/symlink-to-tmp is a broken
-    # symlink; conda's link step rejects it with `[Errno 21] Is a directory`.
-    # Drop the symlink only; keep the rest of the fixtures usable for ch-test.
+    # libexec/charliecloud/fixtures/symlink-to-tmp is a broken symlink that
+    # conda's link step rejects with `[Errno 21] Is a directory`. Drop only
+    # the broken link; keep the other fixtures usable for ch-test.
     - rm -f $PREFIX/libexec/charliecloud/fixtures/symlink-to-tmp
 
-  # libsotest.so.1 is a test fixture shared library (test/sotest/), installed
+  # test/sotest/libsotest.so.1 is a test fixture shared library installed
   # under libexec/charliecloud/sotest/ but not linked from anything we ship.
   missing_dso_whitelist:
     - $RPATH/libsotest.so.1
@@ -39,16 +40,21 @@ requirements:
     - {{ compiler('c') }}
     - {{ stdlib("c") }}
     - make
-    # Required since v0.36 at ./autogen.sh / configure time (see upstream #1845).
+    # Autotools needed because we build from the git archive (no pre-generated
+    # configure). pkg-config is required at autogen.sh time since v0.36
+    # (upstream #1845).
+    - autoconf
+    - automake
+    - libtool
     - pkg-config
 
   host:
     # configure.ac: vmin_python=3.6, vmin_requests=2.6.0
-    - python >=3.6
+    - python {{ python_min }}
     - requests >=2.6.0
 
   run:
-    - python >=3.6
+    - python >={{ python_min }}
     - requests >=2.6.0
     - tar
     # SquashFS image support (vmin_mksquashfs=4.2, vmin_squashfuse=0.1.100).
@@ -57,13 +63,14 @@ requirements:
 
 test:
   commands:
-    # Smoke test the four user-facing entry points. (Subcommand exec paths
-    # like `ch-image gestalt` are intentionally not exercised here because
-    # several lack entry-point registrations and raise NotImplementedError.)
+    # Verify the version baked into the binaries matches the package version;
+    # catches silent build-of-wrong-source errors. Subcommands like
+    # `ch-image gestalt` are not exercised — several lack entry-point
+    # registrations in v0.44 and raise NotImplementedError.
     - ch-run --help
-    - ch-run --version
+    - ch-run --version | grep -Fx {{ version }}
     - ch-image --help
-    - ch-image --version
+    - ch-image --version | grep -Fx {{ version }}
     - ch-convert --help
 
 about:
