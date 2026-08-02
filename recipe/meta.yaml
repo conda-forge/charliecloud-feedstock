@@ -5,46 +5,29 @@ package:
   version: "{{ version }}"
 
 source:
-  # Upstream relocated from github.com/hpc/charliecloud to GitLab in Oct 2024;
-  # releases since v0.40 are cut only on GitLab. Using the templatable git
-  # archive URL so future bumps need only `version` + `sha256` updates.
-  url: https://gitlab.com/charliecloud/charliecloud/-/archive/v{{ version }}/charliecloud-v{{ version }}.tar.gz
-  sha256: 1c2504f8a3f03f85d90e51de561da3b56a659af02f6b2fb732bfaf15d6de01a2
+  # Release asset, not the raw git archive: bundles a pre-generated configure
+  # and Lark, so the build needs no network access or autotools bootstrap.
+  url: https://gitlab.com/charliecloud/charliecloud/-/releases/v{{ version }}/downloads/charliecloud-{{ version }}.tar.gz
+  sha256: 2a01ecbb6cb2cfe0495338484fdba1ea63e44a48caff0d77ddd602f9e12177cf
 
 build:
   number: 0
   skip: true  # [not linux]
   script:
-    # Git archives ship configure.ac only; bootstrap the autotools build.
-    - ./autogen.sh
-    # --enable-buggy-build drops -Werror so the build survives v0.44's str.h
-    # `strncmp` poison-macro vs glibc _FORTIFY_SOURCE `strncmp` macro collision
-    # in conda-forge's sysroot. --disable-html/man skip the sphinx-build probe
-    # since this package doesn't ship docs.
-    - ./configure --prefix=$PREFIX --enable-buggy-build --disable-html --disable-man
+    # buggy-build: bin/str.h poisons strdup/strcmp/strncmp, colliding with
+    # glibc's _FORTIFY_SOURCE macros of the same names under -Werror.
+    # disable-test: matches the old patch's behavior, skipping the
+    # sotest/fixture tree entirely (no more DSO whitelist or symlink fixup).
+    - ./configure --prefix=$PREFIX --enable-buggy-build --disable-html --disable-man --disable-test --enable-ch-image
     - make -j${CPU_COUNT}
     - make install
-    # libexec/charliecloud/fixtures/symlink-to-tmp is a broken symlink that
-    # conda's link step rejects with `[Errno 21] Is a directory`. Drop only
-    # the broken link; keep the other fixtures usable for ch-test.
-    - rm -f $PREFIX/libexec/charliecloud/fixtures/symlink-to-tmp
-
-  # test/sotest/libsotest.so.1 is a test fixture shared library installed
-  # under libexec/charliecloud/sotest/ but not linked from anything we ship.
-  missing_dso_whitelist:
-    - $RPATH/libsotest.so.1
 
 requirements:
   build:
     - {{ compiler('c') }}
     - {{ stdlib("c") }}
     - make
-    # Autotools needed because we build from the git archive (no pre-generated
-    # configure). pkg-config is required at autogen.sh time since v0.36
-    # (upstream #1845).
-    - autoconf
-    - automake
-    - libtool
+    # configure needs this to locate libfuse3 for squashfuse support.
     - pkg-config
 
   host:
@@ -57,22 +40,22 @@ requirements:
     - python
     - requests >=2.6.0
     - tar
+    # ch-image autodetects git and enables the build-cache feature by default.
+    - git
     # SquashFS image support (vmin_mksquashfs=4.2, vmin_squashfuse=0.1.100).
     - squashfs-tools >=4.2
     - squashfuse >=0.1.100
 
 test:
   commands:
-    # Smoke-test the user-facing entry points. ch-image is a Python script,
-    # so version-match guards against a silent build-of-wrong-source. ch-run
-    # writes --version to stderr (argp default), so don't pipe-grep it.
-    # Subcommands like `ch-image gestalt` are not exercised — several lack
-    # entry-point registrations in v0.44 and raise NotImplementedError.
+    # ch-run writes --version to stderr (argp default), so don't pipe-grep it.
     - ch-run --help
     - ch-run --version
     - ch-image --help
     - ch-image --version | grep -Fx {{ version }}
     - ch-convert --help
+    # No-network dependency check; also exercises the bundled Lark import.
+    - ch-image gestalt dependencies
 
 about:
   home: https://charliecloud.io/
