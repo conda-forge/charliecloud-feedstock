@@ -1,19 +1,26 @@
 About charliecloud-feedstock
 ============================
 
-Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/charliecloud-feedstock/blob/main/LICENSE.txt)
+Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/pr24-maintainer-rerender-feedstock/blob/main/LICENSE.txt)
 
-Home: https://hpc.github.io/charliecloud
+Home: https://charliecloud.io/
 
 Package license: Apache-2.0
 
 Summary: Lightweight user-defined software stacks for high-performance computing.
 
-Development: https://github.com/hpc/charliecloud
+Development: https://gitlab.com/charliecloud/charliecloud
 
-Documentation: https://hpc.github.io/charliecloud
+Documentation: https://charliecloud.io/latest/index.html
 
-Lightweight user-defined software stacks for high-performance computing.
+Charliecloud uses Linux user and mount namespaces to run unprivileged
+containers from standard image formats (Docker/OCI) without a daemon or
+setuid root binary, letting HPC users run containerized workloads on
+cluster compute nodes. It includes ch-run (a small C binary launcher),
+ch-image (a Python image manager and builder), and ch-convert (an image
+format converter), targeting environments where rootless Docker/Podman
+aren't viable but unprivileged user namespaces are available.
+
 
 Current build status
 ====================
@@ -22,8 +29,8 @@ Current build status
 <table><tr>
     <td>GitHub Actions</td>
     <td>
-      <a href="https://github.com/conda-forge/charliecloud-feedstock/actions/workflows/conda-build.yml">
-        <img src="https://github.com/conda-forge/charliecloud-feedstock/actions/workflows/conda-build.yml/badge.svg?event=push&branch=main">
+      <a href="https://github.com/conda-forge/pr24-maintainer-rerender-feedstock/actions/workflows/conda-build.yml">
+        <img src="https://github.com/conda-forge/pr24-maintainer-rerender-feedstock/actions/workflows/conda-build.yml/badge.svg?event=push&branch=main">
       </a>
     </td>
   </tr>
@@ -150,5 +157,6 @@ In order to produce a uniquely identifiable distribution:
 Feedstock Maintainers
 =====================
 
+* [@MilkClouds](https://github.com/MilkClouds/)
 * [@ngam](https://github.com/ngam/)
 
