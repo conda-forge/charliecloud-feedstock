@@ -11,7 +11,7 @@ source:
   sha256: 7ff265669751e2593ffed832cc3d98efddd367f306390feeb7714192d54b90bd
 
 build:
-  number: 0
+  number: 1
   skip: true  # [not linux]
   script:
     # buggy-build: bin/str.h poisons strdup/strcmp/strncmp, colliding with
