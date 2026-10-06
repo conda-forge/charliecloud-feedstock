@@ -1,4 +1,4 @@
-{% set version = "0.45.1" %}
+{% set version = "0.45.2" %}
 
 package:
   name: charliecloud
@@ -8,7 +8,7 @@ source:
   # Release asset, not the raw git archive: bundles a pre-generated configure
   # and Lark, so the build needs no network access or autotools bootstrap.
   url: https://gitlab.com/charliecloud/charliecloud/-/releases/v{{ version }}/downloads/charliecloud-{{ version }}.tar.gz
-  sha256: a6508dfae168d646c40f709f0516ce2dfc0123c058f7af0c3e1aa2602300320a
+  sha256: c3c8c46fc70c6ca1213855b8e735d49978ddfb7bf6132017e1717975e8dea0e8
 
 build:
   number: 0
