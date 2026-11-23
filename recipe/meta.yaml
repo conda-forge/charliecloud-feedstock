@@ -1,7 +1,7 @@
 {% set version = "0.45.2" %}
 
 package:
-  name: charliecloud
+  name: charliecloud-split
   version: "{{ version }}"
 
 source:
@@ -11,14 +11,15 @@ source:
   sha256: c3c8c46fc70c6ca1213855b8e735d49978ddfb7bf6132017e1717975e8dea0e8
 
 build:
-  number: 0
+  number: 1
   skip: true  # [not linux]
   script:
     # buggy-build: bin/str.h poisons strdup/strcmp/strncmp, colliding with
     # glibc's _FORTIFY_SOURCE macros of the same names under -Werror.
     # disable-test: matches the old patch's behavior, skipping the
     # sotest/fixture tree entirely (no more DSO whitelist or symlink fixup).
-    - ./configure --prefix=$PREFIX --enable-buggy-build --disable-html --disable-man --disable-test --enable-ch-image
+    # with-python: the scripts' shebang; PYTHON: configure's own check, run with the build prefix's Python.
+    - PYTHON=$BUILD_PREFIX/bin/python ./configure --prefix=$PREFIX --with-python="/usr/bin/env python3" --enable-buggy-build --disable-html --disable-man --disable-test --enable-ch-image
     - make -j${CPU_COUNT}
     - make install
 
@@ -28,34 +29,69 @@ requirements:
     - {{ stdlib("c") }}
     - make
     # configure needs this to locate libfuse3 for squashfuse support.
-    - pkg-config
-
-  host:
-    # python is pinned by conda-forge's build matrix; vmin_python=3.6
-    # in configure.ac but the matrix only builds against 3.10+ anyway.
-    - python
+    - pkgconf
+    # configure only checks for a Python (vmin_python=3.6) with requests.
+    - python >=3.10
     - requests >=2.6.0
 
-  run:
-    - python
-    - requests >=2.6.0
-    - tar
-    # ch-image autodetects git and enables the build-cache feature by default.
-    - git
-    # SquashFS image support (vmin_mksquashfs=4.2, vmin_squashfuse=0.1.100).
-    - squashfs-tools >=4.2
-    - squashfuse >=0.1.100
+# Two outputs so that only the C launcher is built per platform: the rest is scripts (Python, shell) that run on
+# any Python 3, so it is noarch and is not rebuilt for each Python version.
+outputs:
+  - name: charliecloud-ch-run
+    files:
+      - bin/ch-run
+      - bin/ch-checkns
+    requirements:
+      build:
+        - {{ compiler('c') }}
+        - {{ stdlib("c") }}
+    test:
+      commands:
+        # ch-run writes --version to stderr (argp default), so don't pipe-grep it.
+        - ch-run --help
+        - ch-run --version
+        - test ! -e $PREFIX/bin/ch-image
+    about:
+      home: https://charliecloud.io/
+      license: Apache-2.0
+      license_file: LICENSE
+      summary: Charliecloud's container launcher, ch-run (C); install charliecloud for the image tools.
 
-test:
-  commands:
-    # ch-run writes --version to stderr (argp default), so don't pipe-grep it.
-    - ch-run --help
-    - ch-run --version
-    - ch-image --help
-    - ch-image --version | grep -Fx {{ version }}
-    - ch-convert --help
-    # No-network dependency check; also exercises the bundled Lark import.
-    - ch-image gestalt dependencies
+  - name: charliecloud
+    files:
+      - bin/ch-convert
+      - bin/ch-fromhost
+      - bin/ch-image
+      - bin/ch-run-oci
+      - bin/ch-test
+      - lib/charliecloud/
+      - share/doc/charliecloud/
+    build:
+      noarch: python
+    requirements:
+      host:
+        - python {{ python_min }}
+      run:
+        # ch-image runs the ch-run beside it in bin/
+        - charliecloud-ch-run {{ version }}.*
+        - python >={{ python_min }}
+        - requests >=2.6.0
+        - tar
+        # ch-image autodetects git and enables the build-cache feature by default.
+        - git
+        # SquashFS image support (vmin_mksquashfs=4.2, vmin_squashfuse=0.1.100).
+        - squashfs-tools >=4.2
+        - squashfuse >=0.1.100
+    test:
+      requires:
+        - python {{ python_min }}
+      commands:
+        - ch-run --version
+        - ch-image --help
+        - ch-image --version | grep -Fx {{ version }}
+        - ch-convert --help
+        # No-network dependency check; also exercises the bundled Lark import.
+        - ch-image gestalt dependencies
 
 about:
   home: https://charliecloud.io/
@@ -74,6 +110,7 @@ about:
   doc_url: https://charliecloud.io/latest/index.html
 
 extra:
+  feedstock-name: charliecloud
   recipe-maintainers:
     - MilkClouds
     - ngam
